@@ -4,27 +4,30 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-public class HashMapsDurationComparisonMain {
+public class HashMapsMemoryComparisonMain {
 
     public static void main(String[] args) throws InterruptedException {
 
-        DurationThread hmCode = new DurationThread("hm code",
-                                                   HashMapsDurationComparisonMain::hasMapTest);
-        DurationThread whmCode = new DurationThread("whm code",
-                                                   HashMapsDurationComparisonMain::weakHasMapTest);
+        MemoryUsageThread hmCode = new MemoryUsageThread("hm code",
+                                                   HashMapsMemoryComparisonMain::hasMapTest);
+        MemoryUsageThread whmCode = new MemoryUsageThread("whm code",
+                                                   HashMapsMemoryComparisonMain::weakHasMapTest);
 
         hmCode.start();
         whmCode.start();
 
         hmCode.join();
+
+        Thread.sleep(1000);
+
         whmCode.join();
 
         Thread summary = new Thread(() -> System.out.format(
-                             "WeakHashMap based code duration is " +
+                             "WeakHashMap based code memory usage is " +
                              "greater than HashMap's is %s%n" +
-                             "Difference of memory used is %d milliseconds%n",
-                             hmCode.getDuration() < whmCode.getDuration(),
-                             whmCode.getDuration() - hmCode.getDuration()));
+                             "Difference of memory used is %d bytes%n",
+                              hmCode.getUsage() < whmCode.getUsage(),
+                              whmCode.getUsage() - hmCode.getUsage()));
 
         summary.start();
 
@@ -52,32 +55,32 @@ public class HashMapsDurationComparisonMain {
         System.out.println("\tWeakHashMap nilled!\n");
     }
 
-    private static class DurationThread extends Thread {
+    private static class MemoryUsageThread extends Thread {
 
         private String codeName;
         private Runnable code;
-        private long duration;
+        private long usage;
 
-        public long getDuration() {
-            return duration;
+        public long getUsage() {
+            return usage;
         }
 
-        public DurationThread(String codeName, Runnable code) {
+        public MemoryUsageThread(String codeName, Runnable code) {
             this.codeName = codeName;
             this.code = code;
         }
 
         @Override
         public void run() {
-            long start = System.currentTimeMillis();
+            long start = Runtime.getRuntime().freeMemory();
 
             code.run();
 
-            long end = System.currentTimeMillis();
+            long end = Runtime.getRuntime().freeMemory();
 
-            duration = end - start;
-            System.out.format("%s duration is %d milliseconds%n%n",
-                              codeName, duration);
+            usage = end - start;
+            System.out.format("%s used memory is %d bytes%n%n",
+                              codeName, usage);
         }
     }
 }
