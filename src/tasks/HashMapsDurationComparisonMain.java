@@ -20,8 +20,8 @@ public class HashMapsDurationComparisonMain {
         whmCode.join();
 
         Thread summary = new Thread(() -> System.out.format(
-                             "HashMap based code duration is " +
-                             "greater than WeakHashMap's is %s%n%n",
+                             "WeakHashMap based code duration is " +
+                             "greater than HashMap's is %s%n%n",
                               hmCode.getDuration() < whmCode.getDuration()));
 
         summary.start();
@@ -71,7 +71,7 @@ public class HashMapsDurationComparisonMain {
 
             code.run();
 
-            long end = System.currentTimeMillis() - start;
+            long end = System.currentTimeMillis();
 
             duration = end - start;
             System.out.format("%s duration is %d milliseconds%n%n",
